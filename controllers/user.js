@@ -1,33 +1,26 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
+// const { route } = require('../routes/user');
 const userData = {
   id: 22,
   name: 'test',
-  password: '$2b$12$jRerII5S6d1XcpWiqNEm7O5J4kVwm10SLIw14U88cF9VlyEvAG.eS',
+  password: '$2b$12$yhKbjotSZuWWuKeffIsXs.dpC40nlOTTQIjFvAbgUtLporlsniID2',
   role: 'admin',
 };
-const loginUser = async (req, res) => {
-  const { username, password } = req.body;
-  console.log(req.body);
-  const comparepassword = await bcrypt.compare(password, userData.password);
-  if (!comparepassword) {
-    return res.status(403).json({ message: 'Invalid credentials' });
-  }
-  if (username === userData.name) {
-    const token = jwt.sign({ username }, process.env.JWT_SECRET_KEY, {
-      expiresIn: '3h',
-    });
 
-    res.json({
-      message: 'Login successfully',
-      token: token,
-    });
-  } else {
-    res.json({
-      message: 'INvalid credential',
-    });
-  }
-};
+// const registerUser = async(req,res)=>{
+//   try {
+//     const {username ,password} = req.body;
+//     //validate input
+//     if(!username || !password){
+//       return res.status(404).json({message:"All fields are required"})
+//     }
+//     //Check if user already exists
+//     const existUsers = users.find(user => user.name === username)
+//   } catch (error) {
+
+//   }
+// }
 const registerUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -44,9 +37,30 @@ const registerUser = async (req, res) => {
         role: userData.role,
       },
     });
-    console.log(userData);
   } catch (error) {
     console.log(error.message);
+  }
+};
+const loginUser = async (req, res) => {
+  const { username, password } = req.body;
+
+  const comparepassword = await bcrypt.compare(password, userData.password);
+  if (!comparepassword) {
+    return res.status(403).json({ message: 'Invalid credentials' });
+  }
+  if (username === userData.name) {
+    const token = jwt.sign({ userData }, process.env.JWT_SECRET_KEY, {
+      expiresIn: '3h',
+    });
+
+    res.json({
+      message: 'Login successfully',
+      token: token,
+    });
+  } else {
+    res.status(401).json({
+      message: 'Invalid credential',
+    });
   }
 };
 
